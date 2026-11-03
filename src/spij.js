@@ -58,10 +58,14 @@ function decodificarEntidades(texto) {
 
 /** Enlaces a PDFs alojados en el SPIJ (p. ej. normas que solo se publican como PDF). */
 export function pdfsDe(html) {
-  const urls = [...String(html || "").matchAll(/href\s*=\s*["']([^"']+\.pdf)["']/gi)]
-    .map((m) => m[1].replace(/^http:\/\//i, "https://"))
-    .filter((url) => /^https:\/\/spij\.minjus\.gob\.pe\//i.test(url));
-  return [...new Set(urls)];
+  const pdfs = new Map();
+  for (const m of String(html || "").matchAll(/<a\b[^>]*href\s*=\s*["']([^"']+\.pdf)["'][^>]*>([\s\S]*?)<\/a>/gi)) {
+    const url = m[1].replace(/^http:\/\//i, "https://");
+    if (/^https:\/\/spij\.minjus\.gob\.pe\//i.test(url) && !pdfs.has(url)) {
+      pdfs.set(url, { texto: htmlATexto(m[2]).replace(/^Enlace Web:\s*/i, ""), url });
+    }
+  }
+  return [...pdfs.values()];
 }
 
 export function htmlATexto(html) {
@@ -506,7 +510,7 @@ export class SpijClient {
         );
       }
       const archivos = [];
-      for (const url of pdfs) {
+      for (const { url } of pdfs) {
         await this._esperarTurno();
         const respuesta = await fetch(url, {
           signal: AbortSignal.timeout(this.timeoutMs),

@@ -15,7 +15,7 @@ assert.equal(
   htmlATexto(html),
   "Texto Único Nº 1 Decreto [H1386858] PDF [http://spij.minjus.gob.pe/Graficos/x/DS_1.pdf] otro [https://otro.com/y.pdf]",
 );
-assert.deepEqual(pdfsDe(html), ["https://spij.minjus.gob.pe/Graficos/x/DS_1.pdf"]);
+assert.deepEqual(pdfsDe(html), [{ texto: "PDF", url: "https://spij.minjus.gob.pe/Graficos/x/DS_1.pdf" }]);
 
 const cliente = new SpijClient({ silencio: true });
 
@@ -25,7 +25,7 @@ const parte2 = await cliente.obtenerDocumento("H1386858", { maxChars: 2000, desd
 assert.ok(parte1.total_caracteres > 4000);
 assert.ok(parte1.texto.includes("continúa con desde=2000"));
 assert.notEqual(parte1.texto.slice(0, 100), parte2.texto.slice(0, 100));
-assert.ok(parte1.pdfs.some((u) => u.endsWith("DS_111-2024-PCM.pdf")));
+assert.ok(parte1.pdfs.some((p) => p.texto === "Anexo (PDF)." && p.url.endsWith("DS_111-2024-PCM.pdf")));
 
 const [word] = await cliente.exportar("H1386858", "word");
 assert.equal(word.nombre, "H1386858.doc");

@@ -181,7 +181,7 @@ export function registrarHerramientas(server, cliente, opciones = {}) {
     {
       title: "Obtener un documento del SPIJ",
       description:
-        "Descarga el detalle de una norma o resolución a partir de su identificador del SPIJ (campo 'id' de los resultados, por ejemplo 'H1453514'). Incluye sumilla y, cuando el SPIJ lo permite, el texto completo. El campo texto_disponible indica si el texto se obtuvo o si está reservado a suscriptores. Los textos largos se leen por partes con 'desde' (total_caracteres da el tamaño). Las referencias a otras normas aparecen como [H…] (su id, para abrirlas) y los PDF enlazados como [https://…]; el campo pdfs los lista. Si el texto dice DEROGADO, abre la norma que lo deroga.",
+        "Descarga el detalle de una norma o resolución a partir de su identificador del SPIJ (campo 'id' de los resultados, por ejemplo 'H1453514'). Incluye sumilla y, cuando el SPIJ lo permite, el texto completo. El campo texto_disponible indica si el texto se obtuvo o si está reservado a suscriptores. Los textos largos se leen por partes con 'desde' (total_caracteres da el tamaño). Las referencias a otras normas aparecen como [H…] (su id, para abrirlas) y los PDF enlazados como [https://…]; el campo pdfs los lista con su descripción (Anexo, Exposición de motivos…). Si el texto dice DEROGADO, abre la norma que lo deroga. Si un anexo (por ejemplo el texto de un TUO) se publicó aparte, aparece como [H…]: ábrelo, suele traer el texto completo.",
       inputSchema: {
         id: z.string().min(3).describe("Identificador del SPIJ, por ejemplo 'H1453514'."),
         max_caracteres: z
