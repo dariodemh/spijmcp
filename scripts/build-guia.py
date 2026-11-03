@@ -7,7 +7,12 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 from docx.shared import Cm, Pt, RGBColor
+import json
 import os
+
+BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+with open(os.path.join(BASE, "package.json"), encoding="utf-8") as f:
+    VERSION = json.load(f)["version"]
 
 AZUL = RGBColor(0x12, 0x33, 0x5C)
 AZUL_CLARO = RGBColor(0x1C, 0x46, 0x7A)
@@ -178,7 +183,7 @@ def main():
 
     seccion(doc, 1, "Antes de empezar")
     vineta(doc, " instalado en tu computadora.", negrita_hasta="Claude Desktop")
-    vineta(doc, " spij-mcp-0.1.0.mcpb, descargado de la página de releases del proyecto.", negrita_hasta="El archivo")
+    vineta(doc, f" spij-mcp-{VERSION}.mcpb, descargado de la página de releases del proyecto.", negrita_hasta="El archivo")
     vineta(
         doc,
         " usuario y contraseña del SPIJ. Es opcional: sin cuenta verás metadatos y sumillas; "
@@ -192,8 +197,7 @@ def main():
     paso(
         doc,
         3,
-        "Ve a Settings → Extensions → Advanced settings → Install Extension… y elige el archivo descargado. "
-        "Si tu sistema asocia el .mcpb, también puedes hacer doble clic sobre él.",
+        "Haz doble clic sobre el archivo descargado, o ve a Configuración → Extensiones y arrástralo ahí.",
     )
     paso(
         doc,
@@ -204,7 +208,7 @@ def main():
     parrafo(doc, "", espacio=2)
     recuadro(
         doc,
-        "Si no ves el menú Extensions",
+        "Si no ves el menú Extensiones",
         "Actualiza Claude Desktop a la última versión y vuelve a intentarlo. Cerrar y abrir la aplicación "
         "por completo (no solo la ventana) hace que la extensión cargue.",
     )
@@ -223,7 +227,16 @@ def main():
     vineta(doc, "Busca casaciones laborales de 2025 sobre despido arbitrario y hazme un cuadro con número, fecha y sumilla.")
     vineta(doc, "¿Qué normas se publicaron esta semana sobre contrataciones del Estado?")
     vineta(doc, "Encuentra jurisprudencia del Tribunal Constitucional sobre el derecho al agua.")
-    vineta(doc, "Abre el documento H1453514 y dime si tiene texto completo.")
+    vineta(doc, "Busca el TUO de la Ley 27444 vigente y tráeme el artículo 207.")
+    vineta(doc, "Pásame en Word el TUO del Decreto Legislativo 1034.")
+    vineta(doc, "Descarga el PDF del anexo del Decreto Supremo 111-2024-PCM.")
+    parrafo(
+        doc,
+        "Para resultados precisos, da el número de la norma o del expediente. Si solo das el nombre y hay "
+        "varias posibles, Claude te preguntará cuál. Los archivos en Word o PDF se guardan en la carpeta "
+        "Descargas\\SPIJ de tu computadora.",
+        espacio=6,
+    )
 
     seccion(doc, 5, "Texto completo de las resoluciones")
     parrafo(
@@ -268,14 +281,13 @@ def main():
     parrafo(doc, "", espacio=10)
     parrafo(
         doc,
-        "Documentación del proyecto: github.com/dariodemh/spijmcp  ·  Versión 0.1.0",
+        f"Documentación del proyecto: github.com/dariodemh/spijmcp  ·  Versión {VERSION}",
         tam=8.5,
         color=GRIS,
         alineacion=WD_ALIGN_PARAGRAPH.CENTER,
     )
 
-    base = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    salida_docx = os.path.join(base, "dist", "SPIJ-en-Claude-Guia.docx")
+    salida_docx = os.path.join(BASE, "dist", "SPIJ-en-Claude-Guia.docx")
     os.makedirs(os.path.dirname(salida_docx), exist_ok=True)
     doc.save(salida_docx)
     print(salida_docx)
