@@ -1,0 +1,39 @@
+name: release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  empaquetar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Comprobar que los módulos cargan (sin red)
+        run: node --input-type=module -e "await import('./src/app.js'); console.log('app ok')"
+
+      - name: Construir extensión .mcpb
+        run: node scripts/build-mcpb.mjs
+
+      - name: Publicar en la release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/*.mcpb
+            docs/GUIA-USUARIO.md
+            docs/SPIJ-en-Claude-Guia.pdf
+          generate_release_notes: true

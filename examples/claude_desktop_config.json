@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "spij": {
+      "command": "node",
+      "args": [
+        "C:\\Users\\D\\Documents\\deepseek-harness\\default-workspace\\spij-mcp\\src\\server.js"
+      ],
+      "env": {
+        "SPIJ_USUARIO": "",
+        "SPIJ_CLAVE": ""
+      }
+    }
+  }
+}

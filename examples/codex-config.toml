@@ -1,0 +1,12 @@
+# Configuración de Codex CLI para usar spij-mcp desde GitHub.
+# Archivo: ~/.codex/config.toml
+# Reemplaza dariodemh por tu usuario de GitHub.
+
+[mcp_servers.spij]
+command = "npx"
+args = ["-y", "github:dariodemh/spijmcp"]
+
+# Opcional: cuenta de suscriptor del SPIJ para el texto completo.
+[mcp_servers.spij.env]
+SPIJ_USUARIO = ""
+SPIJ_CLAVE = ""

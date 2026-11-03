@@ -1,0 +1,80 @@
+{
+  "manifest_version": "0.3",
+  "name": "spij-mcp",
+  "display_name": "SPIJ Perú",
+  "version": "0.2.0",
+  "description": "Busca normas y jurisprudencia del SPIJ (Perú) directamente desde Claude.",
+  "long_description": "Extensión local para consultar el Sistema Peruano de Información Jurídica (SPIJ) sin salir de Claude.\n\nIncluye herramientas para buscar legislación (leyes, decretos, resoluciones, ordenanzas), buscar jurisprudencia (casaciones, expedientes, sentencias del Tribunal Constitucional, plenos jurisdiccionales), abrir el detalle de un documento por su identificador, consultar los catálogos oficiales del SPIJ y verificar la conexión.\n\nFunciona en modo de acceso libre: metadatos, sumillas y, cuando el SPIJ lo permite, el texto completo. Si tienes una cuenta de suscriptor, puedes configurarla para acceder al texto restringido. Todo se ejecuta en tu computadora: no requiere servidores ni hosting, y las consultas salen desde tu propia conexión.",
+  "author": {
+    "name": "spij-mcp contributors"
+  },
+  "license": "MIT",
+  "keywords": ["spij", "perú", "peru", "jurisprudencia", "normas", "legal", "minjus"],
+  "icon": "icon.png",
+  "server": {
+    "type": "node",
+    "entry_point": "src/server.js",
+    "mcp_config": {
+      "command": "node",
+      "args": ["${__dirname}/src/server.js"],
+      "env": {
+        "SPIJ_USUARIO": "${user_config.spij_usuario}",
+        "SPIJ_CLAVE": "${user_config.spij_clave}",
+        "SPIJ_MCP_REPO": "dariodemh/spijmcp"
+      }
+    }
+  },
+  "user_config": {
+    "spij_usuario": {
+      "type": "string",
+      "title": "Usuario del SPIJ (opcional)",
+      "description": "Tu usuario de suscriptor del SPIJ. Déjalo vacío para usar el acceso libre (metadatos y sumillas).",
+      "required": false,
+      "sensitive": false
+    },
+    "spij_clave": {
+      "type": "string",
+      "title": "Contraseña del SPIJ (opcional)",
+      "description": "Tu contraseña de suscriptor del SPIJ. Se guarda de forma segura y solo se usa para consultar el texto completo.",
+      "required": false,
+      "sensitive": true
+    }
+  },
+  "tools": [
+    {
+      "name": "buscar_normas",
+      "description": "Busca legislación peruana (leyes, decretos, resoluciones, ordenanzas) en el SPIJ."
+    },
+    {
+      "name": "buscar_jurisprudencia",
+      "description": "Busca jurisprudencia peruana (casaciones, expedientes, sentencias, resoluciones del TC) en el SPIJ."
+    },
+    {
+      "name": "obtener_documento",
+      "description": "Obtiene el detalle de una norma o resolución por su identificador del SPIJ."
+    },
+    {
+      "name": "exportar_documento",
+      "description": "Guarda un documento completo en Descargas/SPIJ, en Word (.doc) o como el PDF original."
+    },
+    {
+      "name": "catalogo_spij",
+      "description": "Consulta los catálogos oficiales del SPIJ para filtrar búsquedas."
+    },
+    {
+      "name": "diagnostico_spij",
+      "description": "Comprueba la conexión con el SPIJ y el modo de acceso."
+    },
+    {
+      "name": "comprobar_actualizacion",
+      "description": "Comprueba en GitHub si hay una versión más reciente de la extensión."
+    }
+  ],
+  "compatibility": {
+    "claude_desktop": ">=0.10.0",
+    "platforms": ["darwin", "win32", "linux"],
+    "runtimes": {
+      "node": ">=18.0.0"
+    }
+  }
+}

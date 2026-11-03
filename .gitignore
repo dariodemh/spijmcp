@@ -1,0 +1,8 @@
+node_modules/
+.npm-cache/
+.spij-mcp-build/
+dist/
+recon/
+.env
+*.log
+.DS_Store
