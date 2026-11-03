@@ -34,6 +34,5 @@ jobs:
         with:
           files: |
             dist/*.mcpb
-            docs/GUIA-USUARIO.md
             docs/SPIJ-en-Claude-Guia.pdf
           generate_release_notes: true

@@ -495,7 +495,7 @@ export class SpijClient {
    */
   async exportar(id, formato) {
     const d = await this._detalle(id);
-    // procesarword no aplica el control de suscriptores; se respeta el que sí aplica el detalle.
+    // Solo se exporta lo que el detalle permite ver con el acceso actual.
     if (htmlATexto(d.textoCompleto).toLowerCase().includes(PAYWALL_MARK)) {
       throw new SpijError(
         "El texto completo de este documento está reservado a suscriptores del SPIJ; no se puede exportar con el acceso libre.",

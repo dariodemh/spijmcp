@@ -36,19 +36,12 @@ for (const archivo of ["manifest.json", "icon.png", "package.json", "package-loc
 }
 
 for (const archivo of fs.readdirSync(path.join(raiz, "src"))) {
-  if (archivo.endsWith(".js") && archivo !== "worker.js") {
+  if (archivo.endsWith(".js")) {
     copiar(path.join(raiz, "src", archivo), path.join(stage, "src", archivo));
   }
 }
 
 paso("Instalando dependencias de producción");
-const configStaged = fs.readFileSync(path.join(stage, "src", "config.js"), "utf8");
-if (/REPO_POR_DEFECTO\s*=\s*"TU-USUARIO\//.test(configStaged)) {
-  console.warn(
-    "[build-mcpb] AVISO: src/config.js todavía tiene REPO_POR_DEFECTO = \"TU-USUARIO/spij-mcp\".\n" +
-      "             La comprobación de actualizaciones no funcionará hasta que pongas tu repositorio.",
-  );
-}
 const argsNpm = ["ci", "--omit=dev", "--cache", path.join(raiz, ".npm-cache"), "--no-audit", "--no-fund"];
 if (process.env.npm_execpath) {
   execFileSync(process.execPath, [process.env.npm_execpath, ...argsNpm], {

@@ -1,6 +1,6 @@
 /**
- * Construcción del servidor MCP y del cliente SPIJ compartidos por los
- * distintos transportes (stdio / HTTP / Cloudflare Workers) y por las pruebas.
+ * Construcción del servidor MCP y del cliente SPIJ, compartida por el
+ * servidor stdio y por las pruebas.
  */
 
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";

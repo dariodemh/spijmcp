@@ -2,6 +2,9 @@
  * Definición de las herramientas MCP que exponen el SPIJ.
  */
 
+import fs from "node:fs/promises";
+import os from "node:os";
+import path from "node:path";
 import { z } from "zod";
 import { SpijError } from "./spij.js";
 import { comprobarActualizacion } from "./updates.js";
@@ -228,12 +231,6 @@ export function registrarHerramientas(server, cliente, opciones = {}) {
     async (args) => {
       try {
         const archivos = await cliente.exportar(args.id, args.formato);
-        // Import dinámico: el Worker de Cloudflare no tiene sistema de archivos.
-        const [fs, os, path] = await Promise.all([
-          import("node:fs/promises"),
-          import("node:os"),
-          import("node:path"),
-        ]);
         const carpeta = path.join(os.homedir(), "Downloads", "SPIJ");
         await fs.mkdir(carpeta, { recursive: true });
         const guardados = [];

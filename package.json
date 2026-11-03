@@ -15,14 +15,11 @@
   ],
   "scripts": {
     "start": "node src/server.js",
-    "http": "node src/server.js --http",
-    "build:mcpb": "powershell -ExecutionPolicy Bypass -File scripts/build-mcpb.ps1",
-    "test": "node test/smoke.js && node test/mcp-protocol.js && node test/web-standard.js && node test/updates.js && node test/export.js",
-    "test:updates": "node test/updates.js && node test/export.js",
+    "build:mcpb": "node scripts/build-mcpb.mjs",
+    "test": "node test/smoke.js && node test/mcp-protocol.js && node test/updates.js && node test/export.js",
+    "test:updates": "node test/updates.js",
     "smoke": "node test/smoke.js",
-    "test:protocol": "node test/mcp-protocol.js",
-    "test:web": "node test/web-standard.js",
-    "test:http": "node test/mcp-http.js"
+    "test:protocol": "node test/mcp-protocol.js"
   },
   "engines": {
     "node": ">=18"

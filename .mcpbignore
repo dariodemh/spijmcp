@@ -1,13 +1,6 @@
 test/
-recon/
 docs/
-examples/
 .npm-cache/
-src/worker.js
-Dockerfile
-.dockerignore
-wrangler.toml
-.env.example
 .gitignore
 .mcpbignore
 README.md
