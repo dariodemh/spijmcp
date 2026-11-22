@@ -176,15 +176,23 @@ def main():
         doc,
         "Esta extensión permite buscar normas y jurisprudencia del SPIJ (Sistema Peruano de "
         "Información Jurídica) directamente desde Claude, ChatGPT o Gemini, con sumillas, números "
-        "y enlaces reales. Todo se ejecuta en tu computadora: no hay servidores intermedios ni se "
-        "comparte tu cuenta.",
+        "y enlaces reales. Todo se ejecuta en tu computadora: tus consultas salen desde tu propia "
+        "conexión, tus archivos se guardan en tu PC y nunca se comparte tu cuenta del SPIJ.",
         tam=10.5,
         espacio=6,
     )
 
     seccion(doc, 1, "Antes de empezar")
-    vineta(doc, " (opción más sencilla, con instalación por doble clic) o Node.js 18+ si usarás ChatGPT o Gemini.", negrita_hasta="Claude Desktop")
-    vineta(doc, f" spij-mcp-{VERSION}.mcpb (para Claude Desktop) o la carpeta del proyecto (para ChatGPT y Gemini).", negrita_hasta="Los archivos:")
+    vineta(
+        doc,
+        " (Claude Desktop, Claude Web, ChatGPT Desktop/Web o Gemini Desktop/Web).",
+        negrita_hasta="Tu asistente de IA:",
+    )
+    vineta(
+        doc,
+        f" SPIJ-MCP-Setup.exe (instalador de Windows para ChatGPT, Gemini y Claude Web) o spij-mcp-{VERSION}.mcpb (para Claude Desktop).",
+        negrita_hasta="El instalador:",
+    )
     vineta(
         doc,
         " usuario y contraseña del SPIJ. Es opcional: sin cuenta verás metadatos y sumillas; "
@@ -192,7 +200,42 @@ def main():
         negrita_hasta="Tu cuenta del SPIJ:",
     )
 
-    seccion(doc, 2, "Instalar en Claude Desktop (recomendado)")
+    seccion(doc, 2, "Instalar en ChatGPT, Gemini o Claude Web (Windows)")
+    parrafo(
+        doc,
+        "Con el instalador de Windows obtienes una URL fija permanente que se pega una sola vez y "
+        "no cambia al reiniciar tu computadora. No necesitas instalar Node.js ni usar consola:",
+        espacio=4,
+    )
+    paso(doc, 1, "Descarga SPIJ-MCP-Setup.exe desde la última versión en github.com/dariodemh/spijmcp/releases/latest y ejecútalo.")
+    paso(
+        doc,
+        2,
+        "Si Windows muestra el aviso azul de SmartScreen («Windows protegió su PC»), haz clic en "
+        "«Más información» y luego en «Ejecutar de todas formas».",
+    )
+    paso(
+        doc,
+        3,
+        "Al terminar, se abrirá el panel de SPIJ MCP con tu URL fija permanente "
+        "(https://spijmcp.dariomorales.com/u/.../mcp). Haz clic en «Copiar URL».",
+    )
+    paso(
+        doc,
+        4,
+        "Pégala una sola vez en ChatGPT (Configuración → Aplicaciones / Conectores → Modo desarrollador → Crear), "
+        "en Gemini (Developer Mode / conectores MCP) o en Claude Web (Configuración → Conectores → Agregar conector personalizado).",
+    )
+    parrafo(doc, "", espacio=2)
+    recuadro(
+        doc,
+        "Segundo plano y cuenta suscriptora",
+        "Puedes cerrar la ventana del panel: SPIJ MCP seguirá conectado junto al reloj de Windows. "
+        "Desde el mismo panel puedes activar el inicio automático con Windows y guardar tu cuenta "
+        "suscriptora del SPIJ (solo se almacena en tu propia PC). En Mac o Linux ejecuta: node src/server.js --ui.",
+    )
+
+    seccion(doc, 3, "Instalar en Claude Desktop (archivo .mcpb)")
     paso(doc, 1, "Descarga el archivo .mcpb desde la última release del repositorio.")
     paso(doc, 2, "Abre Claude Desktop.")
     paso(
@@ -212,28 +255,6 @@ def main():
         "Si no ves el menú Extensiones",
         "Actualiza Claude Desktop a la última versión y vuelve a intentarlo. Cerrar y abrir la aplicación "
         "por completo (no solo la ventana) hace que la extensión cargue.",
-    )
-
-    seccion(doc, 3, "Usar en ChatGPT o Gemini (corriendo local en tu PC)")
-    parrafo(
-        doc,
-        "ChatGPT Desktop/Web y Gemini Web se conectan por HTTPS a tu propia computadora mediante un "
-        "túnel automático. Todo sigue ejecutándose en tu PC, con tu conexión y tu carpeta Descargas\\SPIJ:",
-        espacio=4,
-    )
-    paso(doc, 1, "Descarga el proyecto desde github.com/dariodemh/spijmcp (botón Code → Download ZIP) y descomprímelo.")
-    paso(doc, 2, "En Windows, haz doble clic en Iniciar-SPIJ-HTTP.bat (en Mac/Linux ejecuta: node src/server.js --tunnel).")
-    paso(
-        doc,
-        3,
-        "La primera vez instalará las dependencias y descargará el túnel automáticamente. Cuando esté listo, "
-        "copiará una dirección https://...trycloudflare.com/mcp a tu portapapeles.",
-    )
-    paso(
-        doc,
-        4,
-        "Pégala con Ctrl+V en ChatGPT (Configuración → Aplicaciones / Conectores → Modo desarrollador → Crear) "
-        "o en Gemini Web (Developer Mode / conectores MCP). Deja la ventana negra abierta mientras trabajas.",
     )
 
     seccion(doc, 4, "Comprobar que funciona")
@@ -293,8 +314,9 @@ def main():
     tabla_problemas(
         doc,
         [
-            ("No aparece la extensión (Claude)", "Revisa la versión de Claude Desktop y reinicia la aplicación por completo."),
-            ("ChatGPT/Gemini pierde conexión", "Asegúrate de mantener abierta la ventana de Iniciar-SPIJ-HTTP.bat; si la cerraste, ábrela de nuevo y actualiza la URL."),
+            ("Windows muestra aviso SmartScreen", "Es normal en instaladores independientes sin firma comercial. Haz clic en «Más información» → «Ejecutar de todas formas»."),
+            ("No aparece la extensión (Claude Desktop)", "Revisa la versión de Claude Desktop y reinicia la aplicación por completo."),
+            ("ChatGPT / Gemini / Claude Web no conecta", "Verifica que el ícono de SPIJ MCP aparezca junto al reloj de Windows (o ábrelo desde el Escritorio). Tu URL fija no cambia."),
             ("Error 401 o 403 al buscar", "Sesión caducada o red bloqueada; espera un minuto y reintenta."),
             ("Tarda o no conecta", "Posible bloqueo geográfico del SPIJ; prueba sin VPN o desde otra red."),
             ("«texto_disponible: false»", "Documento reservado a suscriptores: configura tu cuenta del SPIJ."),

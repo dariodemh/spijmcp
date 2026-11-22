@@ -34,13 +34,17 @@ import { RELAY_POR_DEFECTO, resolverRepo } from "./config.js";
 import { crearServidorHttp } from "./http.js";
 import { conectarRelay } from "./relay-client.js";
 import { abrirTunel, copiarAlPortapapeles } from "./tunnel.js";
+import { abrirVentanaUi, crearManejadorUi } from "./ui.js";
 import { comprobarActualizacion } from "./updates.js";
+import { escribirEstadoUi, limpiarEstadoUiSync } from "./user-config.js";
 
 function leerOpcionesCli(argv) {
   const puertoEnv = process.env.SPIJ_MCP_PORT || process.env.PORT;
   const opciones = {
     http: (process.env.SPIJ_MCP_TRANSPORT || "").toLowerCase() === "http",
     tunnel: false,
+    ui: false,
+    minimized: false,
     relay: process.env.SPIJ_MCP_RELAY || "",
     port: Number(puertoEnv || 3000),
     puertoExplicito: Boolean(puertoEnv),
@@ -54,6 +58,12 @@ function leerOpcionesCli(argv) {
     const arg = argv[i];
     if (arg === "--http") {
       opciones.http = true;
+    } else if (arg === "--ui") {
+      opciones.ui = true;
+      opciones.http = true;
+      if (!opciones.relay) opciones.relay = RELAY_POR_DEFECTO;
+    } else if (arg === "--minimized" || arg === "--no-open") {
+      opciones.minimized = true;
     } else if (arg === "--tunnel") {
       opciones.tunnel = true;
       opciones.http = true;
@@ -132,29 +142,76 @@ async function iniciar() {
   const instructions = await notaActualizacion();
 
   if (opciones.http) {
-    const httpServer = crearServidorHttp(cliente, {
+    const estadoRelay = { estado: "conectando", urlMcp: "", detalle: "" };
+    let puente = null;
+    let httpServer = null;
+
+    const cerrar = () => {
+      if (opciones.ui) limpiarEstadoUiSync();
+      if (puente) puente.cerrar();
+      if (httpServer) {
+        httpServer.close(() => process.exit(0));
+        setTimeout(() => process.exit(0), 500).unref();
+      } else {
+        process.exit(0);
+      }
+    };
+
+    const manejadorExtra = opciones.ui
+      ? crearManejadorUi({
+          cliente,
+          obtenerEstadoRelay: () => estadoRelay,
+          alSalir: cerrar,
+        })
+      : null;
+
+    httpServer = crearServidorHttp(cliente, {
       repo,
       instructions,
       token: opciones.token,
       permitirExportar: opciones.permitirExportar,
+      manejadorExtra,
     });
 
     const puerto = await escucharHttp(
       httpServer,
       opciones.host,
       opciones.port,
-      (opciones.tunnel || Boolean(opciones.relay)) && !opciones.puertoExplicito,
+      (opciones.tunnel || Boolean(opciones.relay) || opciones.ui) && !opciones.puertoExplicito,
     );
 
     const urlLocal = `http://${opciones.host}:${puerto}`;
-    let puente = null;
 
-    const cerrar = () => {
-      if (puente) puente.cerrar();
-      httpServer.close(() => process.exit(0));
-    };
     process.once("SIGINT", cerrar);
     process.once("SIGTERM", cerrar);
+
+    if (opciones.ui) {
+      const urlUi = `${urlLocal}/ui`;
+      puente = await conectarRelay(urlLocal, {
+        relayUrl: opciones.relay,
+        reintentarInicio: true,
+        onEstado: ({ estado, urlMcp, detalle }) => {
+          estadoRelay.estado = estado;
+          if (urlMcp) estadoRelay.urlMcp = urlMcp;
+          estadoRelay.detalle = detalle || "";
+        },
+      });
+      estadoRelay.urlMcp = puente.urlMcp;
+
+      await escribirEstadoUi({
+        pid: process.pid,
+        port: puerto,
+        urlUi,
+        urlMcp: puente.urlMcp,
+      });
+
+      console.error(`[spij-mcp] v${VERSION} panel local en ${urlUi}`);
+      console.error(`[spij-mcp] URL permanente: ${puente.urlMcp}`);
+      if (!opciones.minimized) {
+        abrirVentanaUi(urlUi);
+      }
+      return;
+    }
 
     if (opciones.relay) {
       console.error(`[spij-mcp] v${VERSION} escuchando localmente en ${urlLocal}/mcp`);

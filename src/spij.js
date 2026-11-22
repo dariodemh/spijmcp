@@ -168,6 +168,15 @@ export class SpijClient {
     return this._modo;
   }
 
+  /** Actualiza las credenciales en caliente y reinicia los tokens de sesión. */
+  configurarCredenciales(usuario = "", clave = "") {
+    this.usuario = String(usuario || "").trim();
+    this.clave = String(clave || "");
+    this._tokens = { back: null, solr: null };
+    this._suscriptorVerificado = false;
+    this._modo = this.usuario && this.clave ? "suscriptor" : "libre";
+  }
+
   _log(...args) {
     if (!this.silencio) console.error("[spij]", ...args);
   }

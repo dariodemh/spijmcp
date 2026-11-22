@@ -7,6 +7,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { SpijClient } from "./spij.js";
 import { registrarHerramientas } from "./tools.js";
 import { VERSION, resolverRepo } from "./config.js";
+import { leerCredencialesGuardadas } from "./user-config.js";
 
 export { VERSION };
 
@@ -23,11 +24,19 @@ Para entregar un documento completo como archivo usa exportar_documento; para le
 El acceso libre entrega metadatos y sumillas; el texto completo de la jurisprudencia puede requerir una cuenta de suscriptor configurada por el usuario.
 Si el usuario pregunta si hay una versión nueva o cómo actualizar la extensión, usa comprobar_actualizacion.`;
 
-/** Crea un cliente SPIJ a partir de variables de entorno o de opciones. */
+/** Crea un cliente SPIJ a partir de variables de entorno, archivo local o de opciones. */
 export function crearCliente(opciones = {}) {
+  const guardadas =
+    opciones.usuario === undefined &&
+    opciones.clave === undefined &&
+    !ENV.SPIJ_USUARIO &&
+    !ENV.SPIJ_CLAVE
+      ? leerCredencialesGuardadas()
+      : { usuario: "", clave: "" };
+
   return new SpijClient({
-    usuario: opciones.usuario ?? ENV.SPIJ_USUARIO,
-    clave: opciones.clave ?? ENV.SPIJ_CLAVE,
+    usuario: opciones.usuario ?? ENV.SPIJ_USUARIO ?? guardadas.usuario,
+    clave: opciones.clave ?? ENV.SPIJ_CLAVE ?? guardadas.clave,
     ...opciones,
   });
 }

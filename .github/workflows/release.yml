@@ -29,10 +29,51 @@ jobs:
       - name: Construir extensión .mcpb
         run: node scripts/build-mcpb.mjs
 
+      - name: Subir artefacto .mcpb
+        uses: actions/upload-artifact@v4
+        with:
+          name: mcpb-bundle
+          path: dist/*.mcpb
+
+  instalador-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Construir instalador de Windows (.exe)
+        run: node scripts/build-windows.mjs
+
+      - name: Subir instalador de Windows
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-installer
+          path: dist/SPIJ-MCP-Setup.exe
+
+  publicar:
+    needs: [empaquetar, instalador-windows]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Descargar artefactos
+        uses: actions/download-artifact@v4
+        with:
+          path: release-assets
+          merge-multiple: true
+
       - name: Publicar en la release
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            dist/*.mcpb
+            release-assets/*.mcpb
+            release-assets/SPIJ-MCP-Setup.exe
             docs/SPIJ-en-Claude-Guia.pdf
           generate_release_notes: true

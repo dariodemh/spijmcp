@@ -1,8 +1,11 @@
 test/
 docs/
+installer/
+relay/
 .npm-cache/
 .gitignore
 .mcpbignore
 README.md
 LICENSE
 package-lock.json
+Iniciar-SPIJ-HTTP.bat

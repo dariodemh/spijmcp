@@ -58,13 +58,23 @@ function tokenValido(req, tokenEsperado) {
  * @param {boolean} [opciones.permitirExportar] Habilita exportar_documento (por defecto true).
  */
 export function crearServidorHttp(cliente, opciones = {}) {
-  const { repo, instructions, token = "", permitirExportar = true } = opciones;
+  const {
+    repo,
+    instructions,
+    token = "",
+    permitirExportar = true,
+    manejadorExtra = null,
+  } = opciones;
 
   return http.createServer(async (req, res) => {
-    aplicarCors(res);
-
     const url = new URL(req.url || "/", `http://${req.headers.host || "localhost"}`);
     const ruta = url.pathname;
+
+    if (manejadorExtra && (await manejadorExtra(req, res, url))) {
+      return;
+    }
+
+    aplicarCors(res);
 
     if (req.method === "OPTIONS") {
       res.writeHead(204);

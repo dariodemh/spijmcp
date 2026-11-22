@@ -72,6 +72,7 @@ export async function conectarRelay(urlLocal, opciones) {
   const { httpBase, wsUrl } = normalizarUrlRelay(opciones.relayUrl);
   const urlMcp = `${httpBase}/u/${identidad.id}/mcp`;
   const onEstado = opciones.onEstado || (() => {});
+  const reintentarInicio = Boolean(opciones.reintentarInicio);
 
   let cerrado = false;
   let wsActual = null;
@@ -100,7 +101,9 @@ export async function conectarRelay(urlLocal, opciones) {
 
   const manejarPeticion = async (ws, msg) => {
     try {
-      const respuesta = await fetch(`${urlLocal}${msg.path || "/mcp"}`, {
+      // Defensa en profundidad: el relay solo puede invocar el endpoint /mcp,
+      // nunca las rutas locales de administración (/ui, /ui/api/*).
+      const respuesta = await fetch(`${urlLocal}/mcp`, {
         method: msg.method || "POST",
         headers: msg.headers || {},
         body: msg.body,
@@ -215,8 +218,9 @@ export async function conectarRelay(urlLocal, opciones) {
       }
       if (cerrado) return;
 
-      // Si falló la primera conexión, reportamos rápido para que el usuario lo vea.
-      if (!listoInicial) {
+      // Si falló la primera conexión, en modo CLI reportamos rápido para que el usuario lo vea.
+      // En modo UI (reintentarInicio), seguimos reintentando (útil al iniciar con Windows sin Wi-Fi aún).
+      if (!listoInicial && !reintentarInicio) {
         listoInicial = true;
         rechazarInicial(
           new Error(
@@ -248,5 +252,9 @@ export async function conectarRelay(urlLocal, opciones) {
   };
 
   abrir();
+  if (reintentarInicio) {
+    listoInicial = true;
+    return { id: identidad.id, urlMcp, cerrar };
+  }
   return promesaInicial;
 }
