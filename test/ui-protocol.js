@@ -51,8 +51,8 @@ try {
   );
   assert.match(
     html,
-    /<a href="https:\/\/dariomorales\.com\/partidas\/assets\/yape\.jpg" target="_blank" rel="noopener noreferrer">Aporte voluntario<\/a>/,
-    "Debe incluir enlace al aporte voluntario en pestaña nueva",
+    /<a class="btn-apoyo" href="https:\/\/dariomorales\.com\/partidas\/assets\/yape\.jpg" target="_blank" rel="noopener noreferrer">[\s\S]*?Aporte voluntario[\s\S]*?<\/a>/,
+    "Debe incluir el botón compacto de aporte voluntario abriendo el QR en pestaña nueva",
   );
   assert.doesNotMatch(
     html,
