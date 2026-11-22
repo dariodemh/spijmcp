@@ -225,6 +225,8 @@ function renderHtml(tokenUi, tieneBandeja) {
   .footer { text-align: center; font-size: 12px; color: var(--muted); padding: 2px 6px 8px; }
   .footer a { color: var(--navy); text-decoration: none; }
   .footer a:hover { text-decoration: underline; }
+  .footer-credit { margin-top: 6px; font-size: 11px; color: var(--muted); opacity: 0.85; }
+  .footer-credit a { color: inherit; }
   .hidden { display: none !important; }
 </style>
 </head>
@@ -317,8 +319,12 @@ function renderHtml(tokenUi, tieneBandeja) {
     <div>${bandejaTexto}</div>
     <div style="margin-top:4px">
       100% local en tu PC ·
-      <a href="https://dariomorales.com/es/spij/" target="_blank" rel="noreferrer">Guía</a> ·
-      <a href="https://github.com/dariodemh/spijmcp" target="_blank" rel="noreferrer">GitHub</a>
+      <a href="https://dariomorales.com/es/spij/" target="_blank" rel="noopener noreferrer">Guía</a> ·
+      <a href="https://github.com/dariodemh/spijmcp" target="_blank" rel="noopener noreferrer">GitHub</a> ·
+      <a href="https://dariomorales.com/partidas/assets/yape.jpg" target="_blank" rel="noopener noreferrer">Aporte voluntario</a>
+    </div>
+    <div class="footer-credit">
+      Creado por Dario Morales - <a href="mailto:dariodemh@gmail.com">dariodemh@gmail.com</a>
     </div>
   </div>
 </div>

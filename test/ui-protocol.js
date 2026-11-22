@@ -44,6 +44,21 @@ try {
   assert.equal(rHtml.status, 200);
   const html = await rHtml.text();
   assert.match(html, /SPIJ MCP/);
+  assert.match(
+    html,
+    /Creado por Dario Morales - <a href="mailto:dariodemh@gmail\.com">dariodemh@gmail\.com<\/a>/,
+    "Debe incluir el crédito discreto con guión normal y enlace mailto",
+  );
+  assert.match(
+    html,
+    /<a href="https:\/\/dariomorales\.com\/partidas\/assets\/yape\.jpg" target="_blank" rel="noopener noreferrer">Aporte voluntario<\/a>/,
+    "Debe incluir enlace al aporte voluntario en pestaña nueva",
+  );
+  assert.doesNotMatch(
+    html,
+    /<img[^>]*yape\.jpg/i,
+    "No debe incrustar la imagen del QR dentro de la app",
+  );
   const matchToken = html.match(/const TOKEN = "([a-f0-9]+)"/);
   assert.ok(matchToken, "Debe incluir token CSRF");
   const token = matchToken[1];
