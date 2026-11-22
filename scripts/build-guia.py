@@ -169,21 +169,22 @@ def main():
     estilo.font.name = "Calibri"
     estilo.font.size = Pt(10.5)
 
-    titulo(doc, "SPIJ en Claude")
-    subtitulo(doc, "Guía de instalación y uso para abogados")
+    titulo(doc, "SPIJ MCP")
+    subtitulo(doc, "Guía de instalación y uso para abogados (Claude, ChatGPT y Gemini)")
 
     parrafo(
         doc,
         "Esta extensión permite buscar normas y jurisprudencia del SPIJ (Sistema Peruano de "
-        "Información Jurídica) directamente en Claude, con sumillas, números y enlaces reales. "
-        "Todo se ejecuta en tu computadora: no hay servidores intermedios ni se comparte tu cuenta.",
+        "Información Jurídica) directamente desde Claude, ChatGPT o Gemini, con sumillas, números "
+        "y enlaces reales. Todo se ejecuta en tu computadora: no hay servidores intermedios ni se "
+        "comparte tu cuenta.",
         tam=10.5,
         espacio=6,
     )
 
     seccion(doc, 1, "Antes de empezar")
-    vineta(doc, " instalado en tu computadora.", negrita_hasta="Claude Desktop")
-    vineta(doc, f" spij-mcp-{VERSION}.mcpb, descargado de la página de releases del proyecto.", negrita_hasta="El archivo")
+    vineta(doc, " (opción más sencilla, con instalación por doble clic) o Node.js 18+ si usarás ChatGPT o Gemini.", negrita_hasta="Claude Desktop")
+    vineta(doc, f" spij-mcp-{VERSION}.mcpb (para Claude Desktop) o la carpeta del proyecto (para ChatGPT y Gemini).", negrita_hasta="Los archivos:")
     vineta(
         doc,
         " usuario y contraseña del SPIJ. Es opcional: sin cuenta verás metadatos y sumillas; "
@@ -191,7 +192,7 @@ def main():
         negrita_hasta="Tu cuenta del SPIJ:",
     )
 
-    seccion(doc, 2, "Instalar en cuatro pasos")
+    seccion(doc, 2, "Instalar en Claude Desktop (recomendado)")
     paso(doc, 1, "Descarga el archivo .mcpb desde la última release del repositorio.")
     paso(doc, 2, "Abre Claude Desktop.")
     paso(
@@ -213,7 +214,29 @@ def main():
         "por completo (no solo la ventana) hace que la extensión cargue.",
     )
 
-    seccion(doc, 3, "Comprobar que funciona")
+    seccion(doc, 3, "Usar en ChatGPT o Gemini (corriendo local en tu PC)")
+    parrafo(
+        doc,
+        "ChatGPT Desktop/Web y Gemini Web se conectan por HTTPS a tu propia computadora mediante un "
+        "túnel automático. Todo sigue ejecutándose en tu PC, con tu conexión y tu carpeta Descargas\\SPIJ:",
+        espacio=4,
+    )
+    paso(doc, 1, "Descarga el proyecto desde github.com/dariodemh/spijmcp (botón Code → Download ZIP) y descomprímelo.")
+    paso(doc, 2, "En Windows, haz doble clic en Iniciar-SPIJ-HTTP.bat (en Mac/Linux ejecuta: node src/server.js --tunnel).")
+    paso(
+        doc,
+        3,
+        "La primera vez instalará las dependencias y descargará el túnel automáticamente. Cuando esté listo, "
+        "copiará una dirección https://...trycloudflare.com/mcp a tu portapapeles.",
+    )
+    paso(
+        doc,
+        4,
+        "Pégala con Ctrl+V en ChatGPT (Configuración → Aplicaciones / Conectores → Modo desarrollador → Crear) "
+        "o en Gemini Web (Developer Mode / conectores MCP). Deja la ventana negra abierta mientras trabajas.",
+    )
+
+    seccion(doc, 4, "Comprobar que funciona")
     parrafo(doc, "En el chat, escribe:", espacio=2)
     recuadro(doc, "Ejemplo", "«Ejecuta diagnostico_spij y dime el estado.»")
     parrafo(
@@ -223,7 +246,7 @@ def main():
         espacio=6,
     )
 
-    seccion(doc, 4, "Qué puedes pedirle")
+    seccion(doc, 5, "Qué puedes pedirle")
     vineta(doc, "Busca casaciones laborales de 2025 sobre despido arbitrario y hazme un cuadro con número, fecha y sumilla.")
     vineta(doc, "¿Qué normas se publicaron esta semana sobre contrataciones del Estado?")
     vineta(doc, "Encuentra jurisprudencia del Tribunal Constitucional sobre el derecho al agua.")
@@ -233,25 +256,25 @@ def main():
     parrafo(
         doc,
         "Para resultados precisos, da el número de la norma o del expediente. Si solo das el nombre y hay "
-        "varias posibles, Claude te preguntará cuál. Los archivos en Word o PDF se guardan en la carpeta "
+        "varias posibles, el asistente te preguntará cuál. Los archivos en Word o PDF se guardan en la carpeta "
         "Descargas\\SPIJ de tu computadora.",
         espacio=6,
     )
 
-    seccion(doc, 5, "Texto completo de las resoluciones")
+    seccion(doc, 6, "Texto completo de las resoluciones")
     parrafo(
         doc,
         "El acceso libre del SPIJ entrega metadatos y sumillas. Para leer el texto completo de casaciones, "
-        "sentencias y expedientes necesitas una cuenta de suscriptor del SPIJ, configurada en el paso 4. "
-        "Si un documento no está disponible, Claude te lo indicará y podrás abrirlo en el SPIJ con tu sesión.",
+        "sentencias y expedientes necesitas una cuenta de suscriptor del SPIJ. "
+        "Si un documento no está disponible, el asistente te lo indicará y podrás abrirlo en el SPIJ con tu sesión.",
         espacio=6,
     )
 
-    seccion(doc, 6, "Actualizaciones")
+    seccion(doc, 7, "Actualizaciones")
     parrafo(
         doc,
-        "Pregunta en el chat «¿Hay actualizaciones del conector del SPIJ?». Claude consultará el repositorio "
-        "y te dirá la versión instalada, la última publicada y el enlace de descarga. Para actualizar, instala "
+        "Pregunta en el chat «¿Hay actualizaciones del conector del SPIJ?». Consultará el repositorio "
+        "y te dirá la versión instalada, la última publicada y el enlace de descarga. En Claude Desktop, instala "
         "el nuevo .mcpb igual que la primera vez: reemplaza al anterior y conserva tu configuración.",
         espacio=6,
     )
@@ -266,11 +289,12 @@ def main():
         color_borde="C77A1A",
     )
 
-    seccion(doc, 7, "Problemas comunes")
+    seccion(doc, 8, "Problemas comunes")
     tabla_problemas(
         doc,
         [
-            ("No aparece la extensión", "Revisa la versión de Claude Desktop y reinicia la aplicación por completo."),
+            ("No aparece la extensión (Claude)", "Revisa la versión de Claude Desktop y reinicia la aplicación por completo."),
+            ("ChatGPT/Gemini pierde conexión", "Asegúrate de mantener abierta la ventana de Iniciar-SPIJ-HTTP.bat; si la cerraste, ábrela de nuevo y actualiza la URL."),
             ("Error 401 o 403 al buscar", "Sesión caducada o red bloqueada; espera un minuto y reintenta."),
             ("Tarda o no conecta", "Posible bloqueo geográfico del SPIJ; prueba sin VPN o desde otra red."),
             ("«texto_disponible: false»", "Documento reservado a suscriptores: configura tu cuenta del SPIJ."),

@@ -56,6 +56,9 @@ export function crearServidor(cliente, opciones = {}) {
     { instructions },
   );
 
-  registrarHerramientas(server, cliente, { repo });
+  registrarHerramientas(server, cliente, {
+    repo,
+    permitirExportar: opciones.permitirExportar,
+  });
   return server;
 }

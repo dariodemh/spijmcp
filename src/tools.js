@@ -104,6 +104,7 @@ function rangoPagina(pagina, porPagina) {
  */
 export function registrarHerramientas(server, cliente, opciones = {}) {
   const repo = opciones.repo || "";
+  const permitirExportar = opciones.permitirExportar !== false;
   server.registerTool(
     "buscar_normas",
     {
@@ -216,35 +217,37 @@ export function registrarHerramientas(server, cliente, opciones = {}) {
     },
   );
 
-  server.registerTool(
-    "exportar_documento",
-    {
-      title: "Exportar un documento del SPIJ",
-      description:
-        "Guarda un documento del SPIJ en la carpeta Descargas/SPIJ del usuario, completo (sin el límite de caracteres de obtener_documento). formato 'word' genera el mismo archivo .doc que el botón Descargar del SPIJ; formato 'pdf' descarga los PDF originales que el documento enlaza (útil cuando la norma solo se publica como PDF). Devuelve las rutas de los archivos guardados. No exporta textos reservados a suscriptores.",
-      inputSchema: {
-        id: z.string().min(3).describe("Identificador del SPIJ, por ejemplo 'H1386858'."),
-        formato: z.enum(["word", "pdf"]).default("word").describe("'word' (.doc) o 'pdf' (PDF original enlazado)."),
+  if (permitirExportar) {
+    server.registerTool(
+      "exportar_documento",
+      {
+        title: "Exportar un documento del SPIJ",
+        description:
+          "Guarda un documento del SPIJ en la carpeta Descargas/SPIJ del usuario, completo (sin el límite de caracteres de obtener_documento). formato 'word' genera el mismo archivo .doc que el botón Descargar del SPIJ; formato 'pdf' descarga los PDF originales que el documento enlaza (útil cuando la norma solo se publica como PDF). Devuelve las rutas de los archivos guardados. No exporta textos reservados a suscriptores.",
+        inputSchema: {
+          id: z.string().min(3).describe("Identificador del SPIJ, por ejemplo 'H1386858'."),
+          formato: z.enum(["word", "pdf"]).default("word").describe("'word' (.doc) o 'pdf' (PDF original enlazado)."),
+        },
+        annotations: { readOnlyHint: false, destructiveHint: false, openWorldHint: true },
       },
-      annotations: { readOnlyHint: false, destructiveHint: false, openWorldHint: true },
-    },
-    async (args) => {
-      try {
-        const archivos = await cliente.exportar(args.id, args.formato);
-        const carpeta = path.join(os.homedir(), "Downloads", "SPIJ");
-        await fs.mkdir(carpeta, { recursive: true });
-        const guardados = [];
-        for (const archivo of archivos) {
-          const ruta = path.join(carpeta, path.basename(archivo.nombre));
-          await fs.writeFile(ruta, archivo.datos);
-          guardados.push({ ruta, bytes: archivo.datos.length });
+      async (args) => {
+        try {
+          const archivos = await cliente.exportar(args.id, args.formato);
+          const carpeta = path.join(os.homedir(), "Downloads", "SPIJ");
+          await fs.mkdir(carpeta, { recursive: true });
+          const guardados = [];
+          for (const archivo of archivos) {
+            const ruta = path.join(carpeta, path.basename(archivo.nombre));
+            await fs.writeFile(ruta, archivo.datos);
+            guardados.push({ ruta, bytes: archivo.datos.length });
+          }
+          return textoSalida({ guardados });
+        } catch (error) {
+          return errorSalida(error);
         }
-        return textoSalida({ guardados });
-      } catch (error) {
-        return errorSalida(error);
-      }
-    },
-  );
+      },
+    );
+  }
 
   server.registerTool(
     "catalogo_spij",

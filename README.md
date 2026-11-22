@@ -1,6 +1,6 @@
 # spij-mcp
 
-Extensión MCP no oficial para buscar **normas y jurisprudencia del SPIJ** (Sistema Peruano de Información Jurídica, MINJUS) desde Claude. Corre en tu computadora y consulta el SPIJ desde tu propia conexión.
+Extensión MCP no oficial para buscar **normas y jurisprudencia del SPIJ** (Sistema Peruano de Información Jurídica, MINJUS) desde Claude, Gemini, ChatGPT y cualquier cliente compatible con MCP. Corre en tu computadora y consulta el SPIJ desde tu propia conexión.
 
 | Herramienta | Qué hace |
 |---|---|
@@ -26,6 +26,31 @@ claude mcp add spij -s user -- node "$PWD/src/server.js"
 ```
 
 Para usar tu cuenta de suscriptor, añade `--env SPIJ_USUARIO=... --env SPIJ_CLAVE=...`.
+
+**ChatGPT Desktop / Web, Gemini Web y otros clientes MCP por HTTP (`Streamable HTTP`):**
+
+En **Windows**, haz doble clic en [`Iniciar-SPIJ-HTTP.bat`](Iniciar-SPIJ-HTTP.bat) (o ejecuta en cualquier sistema):
+
+```powershell
+node src/server.js --tunnel
+```
+
+Esto levanta el servidor local, abre automáticamente un túnel HTTPS (descarga `cloudflared` la primera vez si no lo tienes) y **copia la URL `https://.../mcp` a tu portapapeles**. Solo pégala con `Ctrl+V` en:
+- **ChatGPT:** *Configuración → Aplicaciones / Conectores → Modo desarrollador → Crear*
+- **Gemini Web:** *Developer Mode* / conectores MCP
+
+Deja la ventana abierta mientras uses el SPIJ (todo sigue corriendo en tu propia PC, con tu IP y tu carpeta `Descargas/SPIJ`).
+
+<details>
+<summary>Opciones avanzadas del modo HTTP</summary>
+
+- `node src/server.js --http`: inicia solo el servidor local en `http://127.0.0.1:3000/mcp` (sin túnel; estado en `/health`).
+- `--port <puerto>` / `SPIJ_MCP_PORT` / `PORT` (por defecto `3000`).
+- `--host <ip>` / `SPIJ_MCP_HOST` / `HOST` (por defecto `127.0.0.1`).
+- `--token <secreto>` / `SPIJ_MCP_TOKEN`: protege `/mcp` exigiendo `Authorization: Bearer <secreto>`.
+- `--sin-exportar` / `SPIJ_MCP_SIN_EXPORTAR=1`: oculta `exportar_documento`.
+
+</details>
 
 ## Acceso libre y suscriptor
 
