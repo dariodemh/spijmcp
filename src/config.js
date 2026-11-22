@@ -7,7 +7,7 @@
 
 const ENV = (typeof process !== "undefined" && process.env) || {};
 
-export const VERSION = "0.3.0";
+export const VERSION = "0.3.1";
 
 /** Repositorio usado para comprobar actualizaciones. */
 export const REPO_POR_DEFECTO = "dariodemh/spijmcp";

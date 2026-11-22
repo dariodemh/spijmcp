@@ -2,7 +2,7 @@
   "manifest_version": "0.3",
   "name": "spij-mcp",
   "display_name": "SPIJ Perú",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Busca normas y jurisprudencia del SPIJ (Perú) directamente desde Claude.",
   "long_description": "Extensión local para consultar el Sistema Peruano de Información Jurídica (SPIJ) sin salir de Claude.\n\nIncluye herramientas para buscar legislación (leyes, decretos, resoluciones, ordenanzas), buscar jurisprudencia (casaciones, expedientes, sentencias del Tribunal Constitucional, plenos jurisdiccionales), abrir el detalle de un documento por su identificador, consultar los catálogos oficiales del SPIJ y verificar la conexión.\n\nFunciona en modo de acceso libre: metadatos, sumillas y, cuando el SPIJ lo permite, el texto completo. Si tienes una cuenta de suscriptor, puedes configurarla para acceder al texto restringido. Todo se ejecuta en tu computadora: no requiere servidores ni hosting, y las consultas salen desde tu propia conexión.",
   "author": {
