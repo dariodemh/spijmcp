@@ -16,13 +16,15 @@
   "scripts": {
     "start": "node src/server.js",
     "start:http": "node src/server.js --http",
+    "start:relay": "node src/server.js --relay",
     "start:tunnel": "node src/server.js --tunnel",
     "build:mcpb": "node scripts/build-mcpb.mjs",
     "test": "node test/smoke.js && node test/mcp-protocol.js && node test/http-protocol.js && node test/updates.js && node test/export.js",
     "test:updates": "node test/updates.js",
     "smoke": "node test/smoke.js",
     "test:protocol": "node test/mcp-protocol.js",
-    "test:http": "node test/http-protocol.js"
+    "test:http": "node test/http-protocol.js",
+    "test:relay": "node test/relay-protocol.js"
   },
   "engines": {
     "node": ">=18"

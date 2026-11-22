@@ -1,0 +1,17 @@
+{
+  "name": "spij-mcp-relay",
+  "version": "0.1.0",
+  "description": "Relay WebSocket <-> Streamable HTTP para conectar spij-mcp local con URL fija",
+  "type": "module",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "ws": "^8.18.0"
+  }
+}

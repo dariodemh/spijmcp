@@ -12,6 +12,9 @@ export const VERSION = "0.2.0";
 /** Repositorio usado para comprobar actualizaciones. */
 export const REPO_POR_DEFECTO = "dariodemh/spijmcp";
 
+/** Relay por defecto para URL HTTPS fija en modo --relay. */
+export const RELAY_POR_DEFECTO = "https://spijmcp.dariomorales.com";
+
 export const REPO = ENV.SPIJ_MCP_REPO || REPO_POR_DEFECTO;
 
 /** ¿El valor parece un repositorio real de GitHub ("usuario/repo")? */

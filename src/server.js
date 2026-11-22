@@ -30,8 +30,9 @@
 
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { crearCliente, crearServidor, VERSION } from "./app.js";
-import { resolverRepo } from "./config.js";
+import { RELAY_POR_DEFECTO, resolverRepo } from "./config.js";
 import { crearServidorHttp } from "./http.js";
+import { conectarRelay } from "./relay-client.js";
 import { abrirTunel, copiarAlPortapapeles } from "./tunnel.js";
 import { comprobarActualizacion } from "./updates.js";
 
@@ -40,12 +41,14 @@ function leerOpcionesCli(argv) {
   const opciones = {
     http: (process.env.SPIJ_MCP_TRANSPORT || "").toLowerCase() === "http",
     tunnel: false,
+    relay: process.env.SPIJ_MCP_RELAY || "",
     port: Number(puertoEnv || 3000),
     puertoExplicito: Boolean(puertoEnv),
     host: process.env.SPIJ_MCP_HOST || process.env.HOST || "127.0.0.1",
     token: process.env.SPIJ_MCP_TOKEN || "",
     permitirExportar: process.env.SPIJ_MCP_SIN_EXPORTAR !== "1",
   };
+  if (opciones.relay) opciones.http = true;
 
   for (let i = 0; i < argv.length; i++) {
     const arg = argv[i];
@@ -54,6 +57,16 @@ function leerOpcionesCli(argv) {
     } else if (arg === "--tunnel") {
       opciones.tunnel = true;
       opciones.http = true;
+    } else if (arg === "--relay") {
+      opciones.http = true;
+      if (argv[i + 1] && !argv[i + 1].startsWith("--")) {
+        opciones.relay = argv[++i];
+      } else {
+        opciones.relay = RELAY_POR_DEFECTO;
+      }
+    } else if (arg.startsWith("--relay=")) {
+      opciones.http = true;
+      opciones.relay = arg.slice(8) || RELAY_POR_DEFECTO;
     } else if (arg === "--port" && argv[i + 1]) {
       opciones.port = Number(argv[++i]);
       opciones.puertoExplicito = true;
@@ -130,29 +143,62 @@ async function iniciar() {
       httpServer,
       opciones.host,
       opciones.port,
-      opciones.tunnel && !opciones.puertoExplicito,
+      (opciones.tunnel || Boolean(opciones.relay)) && !opciones.puertoExplicito,
     );
 
     const urlLocal = `http://${opciones.host}:${puerto}`;
-    let tunel = null;
+    let puente = null;
 
     const cerrar = () => {
-      if (tunel) tunel.cerrar();
+      if (puente) puente.cerrar();
       httpServer.close(() => process.exit(0));
     };
     process.once("SIGINT", cerrar);
     process.once("SIGTERM", cerrar);
 
+    if (opciones.relay) {
+      console.error(`[spij-mcp] v${VERSION} escuchando localmente en ${urlLocal}/mcp`);
+      console.error(`[spij-mcp] Conectando al relay ${opciones.relay}...`);
+      puente = await conectarRelay(urlLocal, {
+        relayUrl: opciones.relay,
+        onEstado: ({ estado, detalle }) => {
+          if (estado === "reconectando") {
+            console.error(`[spij-mcp] Conexión perdida con el relay. ${detalle || ""}`);
+          } else if (estado === "conectado" && puente) {
+            console.error("[spij-mcp] Reconectado al relay.");
+          }
+        },
+      });
+      const copiado = await copiarAlPortapapeles(puente.urlMcp);
+
+      console.error("");
+      console.error("============================================================");
+      console.error("  SPIJ MCP listo para ChatGPT / Gemini (URL fija permanente)");
+      console.error(`  URL: ${puente.urlMcp}`);
+      if (copiado) {
+        console.error("  (Copiada al portapapeles: pégala con Ctrl+V una sola vez)");
+      }
+      if (opciones.token) {
+        console.error("  Autenticación: Bearer token activado");
+      }
+      console.error(`  Modo de acceso SPIJ: ${cliente.modo}`);
+      console.error("  Deja esta ventana abierta mientras uses el SPIJ.");
+      console.error("  Presiona Ctrl+C o cierra esta ventana para detener.");
+      console.error("============================================================");
+      console.error("");
+      return;
+    }
+
     if (opciones.tunnel) {
       console.error(`[spij-mcp] v${VERSION} escuchando localmente en ${urlLocal}/mcp`);
       console.error("[spij-mcp] Abriendo túnel HTTPS...");
-      tunel = await abrirTunel(urlLocal);
-      const copiado = await copiarAlPortapapeles(tunel.urlMcp);
+      puente = await abrirTunel(urlLocal);
+      const copiado = await copiarAlPortapapeles(puente.urlMcp);
 
       console.error("");
       console.error("============================================================");
       console.error("  SPIJ MCP listo para ChatGPT / Gemini");
-      console.error(`  URL: ${tunel.urlMcp}`);
+      console.error(`  URL: ${puente.urlMcp}`);
       if (copiado) {
         console.error("  (Copiada al portapapeles: pégala con Ctrl+V)");
       }
