@@ -30,7 +30,24 @@ async function cerrar(server) {
 const tmpDir = await fsp.mkdtemp(path.join(os.tmpdir(), "spij-relay-test-"));
 const rutaIdentidad = path.join(tmpDir, "relay.json");
 
-const { httpServer: relayServer } = crearRelay();
+const hitsEnviados = [];
+const mockGoatFetch = async (url, init) => {
+  assert.equal(url, "https://ejemplo.goatcounter.com/api/v0/count");
+  assert.equal(init.headers.Authorization, "Bearer token-prueba");
+  const payload = JSON.parse(init.body);
+  assert.equal(payload.no_sessions, true);
+  hitsEnviados.push(...payload.hits);
+  return { ok: true, status: 202 };
+};
+
+const { httpServer: relayServer, metricas } = crearRelay({
+  goatcounter: {
+    site: "ejemplo.goatcounter.com",
+    token: "token-prueba",
+    fetchImpl: mockGoatFetch,
+    flushIntervalMs: 60_000,
+  },
+});
 const relayBase = await escuchar(relayServer);
 
 const clienteSpij = crearCliente({ intervaloMinimoMs: 300 });
@@ -95,6 +112,27 @@ try {
   const { tools: tools2 } = await client.listTools();
   assert.equal(tools2.length, 7);
   console.log("Reconexión con URL fija OK.");
+
+  // 7. Verificar métricas agregadas de GoatCounter (deduplicación diaria + herramientas, sin IDs ni argumentos)
+  await metricas.flush();
+  const rutas = hitsEnviados.map((h) => h.path);
+  assert.equal(rutas.filter((r) => r === "mcp/usuario").length, 1, `Se esperaba 1 mcp/usuario, hay: ${rutas}`);
+  assert.equal(
+    rutas.filter((r) => r === "mcp/cliente/prueba-relay").length,
+    1,
+    `Se esperaba 1 mcp/cliente/prueba-relay, hay: ${rutas}`,
+  );
+  assert.equal(
+    rutas.filter((r) => r === "mcp/tool/diagnostico_spij").length,
+    1,
+    `Se esperaba 1 mcp/tool/diagnostico_spij, hay: ${rutas}`,
+  );
+  assert.ok(hitsEnviados.every((h) => h.event === true), "Todos los hits deben marcarse como event: true");
+  assert.ok(
+    !JSON.stringify(hitsEnviados).includes(puente.id),
+    "Las métricas nunca deben incluir el ID del relay en claro",
+  );
+  console.log("Métricas anónimas de GoatCounter OK:", rutas.join(", "));
 
   await client.close();
 } finally {
