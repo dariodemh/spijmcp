@@ -152,7 +152,10 @@ function crearMetricasGoatCounter(config = {}) {
         signal: AbortSignal.timeout(5000),
       });
       if (!res.ok) {
-        console.warn(`[spij-mcp-relay] GoatCounter respondió HTTP ${res.status}`);
+        const detalle = typeof res.text === "function" ? (await res.text().catch(() => "")).trim().slice(0, 200) : "";
+        console.warn(
+          `[spij-mcp-relay] GoatCounter respondió HTTP ${res.status} (${endpoint})${detalle ? `: ${detalle}` : ""}`,
+        );
       }
     } catch (err) {
       console.warn(`[spij-mcp-relay] Error enviando métricas a GoatCounter: ${err.message}`);
